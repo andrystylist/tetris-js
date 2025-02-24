@@ -1,6 +1,7 @@
-import './style.css'
 
 const $button = document.querySelector('button')
+const $title = document.querySelector('h1')
+// const $message = document.querySelector('')
 
 $button.addEventListener('click', () => {
   console.log($button)
@@ -11,6 +12,7 @@ $button.addEventListener('click', () => {
   audio.volume = 0.5
   audio.play()
   document.querySelector('#app').classList.remove('hidden')
+  $title.classList.add('hidden')
 })
 
 const canvas = document.querySelector('canvas')
@@ -18,7 +20,7 @@ const context = canvas.getContext('2d')
 const $score = document.querySelector('span')
 
 const BLOCK_SIZE = 20 // tamaño en pixeles de los bloques
-const BOARD_WIDTH = 14 // cantidad de bloques a lo ancho
+const BOARD_WIDTH = 20 // cantidad de bloques a lo ancho
 const BOARD_HEIGHT = 30 // cantidad de bloques a lo alto
 
 let score = 0
@@ -38,15 +40,6 @@ for (let i = 0; i < BOARD_HEIGHT; i++) {
     board[i].push(0)
   }
 }
-// board[29] = [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1]
-
-const piece = {
-  position: { x: 6, y: 6 },
-  shape: [
-    [1, 1],
-    [1, 1]
-  ]
-}
 
 const PIECES = [
   [
@@ -61,8 +54,14 @@ const PIECES = [
     [1, 1, 1]
   ],
   [
-    [1, 1, 0],
-    [0, 1, 1]
+    [1, 0],
+    [1, 1],
+    [0, 1]
+  ],
+  [
+    [0, 1],
+    [1, 1],
+    [1, 0]
   ],
   [
     [1, 0],
@@ -72,12 +71,29 @@ const PIECES = [
   [
     [0, 1, 1],
     [1, 1, 0]
+  ],
+  [
+    [0, 1],
+    [0, 1],
+    [1, 1]
   ]
 ]
+
+const COLORS =
+[
+  '#F25F5C', '#6435C9', '#2BCE48', '#00B8D4', '#FFB822'
+]
+
+const piece = {
+  position: { x: Math.floor(Math.random() * (BOARD_WIDTH - 1)), y: 0 },
+  color: COLORS[Math.floor(Math.random() * COLORS.length)],
+  shape: PIECES[Math.floor(Math.random() * PIECES.length)]
+}
 
 // game loop
 let dropCounter = 0
 let lastTime = 0
+
 function update (time = 0) {
   const deltaTime = time - lastTime
   lastTime = time
@@ -115,7 +131,7 @@ function draw () {
   piece.shape.forEach((row, y) => {
     row.forEach((value, x) => {
       if (value === 1) {
-        context.fillStyle = 'red'
+        context.fillStyle = piece.color
         context.fillRect(x + piece.position.x, y + piece.position.y, 1, 1)
       }
     })
@@ -144,6 +160,7 @@ function solidifyPiece () {
 
   // get randow shape
   piece.shape = PIECES[Math.floor(Math.random() * PIECES.length)]
+  piece.color = COLORS[Math.floor(Math.random() * COLORS.length)]
   // reset position
   piece.position.x = 5
   piece.position.y = 0
@@ -151,6 +168,7 @@ function solidifyPiece () {
   if (checkCollision()) {
     window.alert('Game over!! Sorry!')
     board.forEach((row) => row.fill(0))
+    score = 0
   }
 }
 
